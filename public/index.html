@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlexiAgent Chat Tester</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="avatar-wrap">
+        <div class="avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8M12 8v8"/>
+          </svg>
+        </div>
+        <div class="online-dot"></div>
+      </div>
+      <div class="header-info">
+        <span class="bot-name" id="botName">FlexiAgent</span>
+        <span class="status" id="statusText">Online</span>
+      </div>
+      <button class="history-btn" id="historyBtn" title="View conversation history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+        </svg>
+      </button>
+      <button class="history-btn" id="settingsBtn" title="Webhook settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Messages -->
+    <main class="messages" id="messages">
+      <div class="date-chip">Today</div>
+      <div class="message bot" id="welcomeMsg">
+        <div class="msg-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8M12 8v8"/>
+          </svg>
+        </div>
+        <div class="bubble">
+          <p>Hi! I'm connected to FlexiAgent. Send me a message to test the webhook.</p>
+          <span class="time" id="welcomeTime"></span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Typing indicator (hidden by default) -->
+    <div class="typing-wrap" id="typingWrap" style="display:none">
+      <div class="msg-avatar small">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 12h8M12 8v8"/>
+        </svg>
+      </div>
+      <div class="typing-indicator">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <footer class="input-bar">
+      <textarea
+        id="msgInput"
+        placeholder="Type a message…"
+        rows="1"
+        autocomplete="off"
+      ></textarea>
+      <button class="send-btn" id="sendBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </footer>
+  </div>
+
+  <!-- History modal -->
+  <div class="modal-overlay" id="historyModal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span>Conversation History</span>
+        <button id="closeModal">✕</button>
+      </div>
+      <div class="modal-body" id="historyBody">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="settingsModal" style="display:none">
+    <div class="modal settings-modal">
+      <div class="modal-header">
+        <span>Webhook &amp; API Settings</span>
+        <button id="closeSettings">✕</button>
+      </div>
+      <div class="modal-body settings-body">
+
+        <!-- Outgoing webhook section -->
+        <div class="settings-section">
+          <div class="settings-section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Outgoing Webhook (to FlexiAgent)
+          </div>
+          <p class="settings-hint">Messages from the chat are forwarded to this URL as a POST request.</p>
+
+          <label class="settings-label">Webhook URL</label>
+          <input type="url" id="setWebhookUrl" class="settings-input"
+            placeholder="https://your-flexiagent-url/webhook" autocomplete="off" />
+
+          <label class="settings-label">API Key <span class="opt">(optional)</span></label>
+          <div class="input-with-eye">
+            <input type="password" id="setApiKey" class="settings-input"
+              placeholder="Leave blank to keep existing key" autocomplete="new-password" />
+            <button class="eye-btn" id="toggleKey" type="button">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <p class="settings-hint key-hint" id="currentKeyHint" style="display:none"></p>
+
+          <label class="settings-label">Bot Display Name</label>
+          <input type="text" id="setBotName" class="settings-input" placeholder="FlexiAgent" />
+
+          <div class="settings-actions">
+            <button class="btn-test" id="testWebhookBtn">Test Connection</button>
+            <button class="btn-save" id="saveSettingsBtn">Save Settings</button>
+          </div>
+          <div class="test-result" id="testResult" style="display:none"></div>
+        </div>
+
+        <!-- Incoming webhook section -->
+        <div class="settings-section">
+          <div class="settings-section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Incoming Webhook (from FlexiAgent)
+          </div>
+          <p class="settings-hint">Paste this URL into FlexiAgent so it can push async replies back to this chat.</p>
+          <div class="copy-row">
+            <code class="copy-url" id="incomingUrl">loading…</code>
+            <button class="btn-copy" id="copyIncomingBtn">Copy</button>
+          </div>
+          <p class="settings-hint" style="margin-top:8px">Expected payload: <code>{"sessionId":"…","reply":"…"}</code></p>
+        </div>
+
+        <!-- API endpoint reference -->
+        <div class="settings-section">
+          <div class="settings-section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+            </svg>
+            API Endpoint Reference
+          </div>
+          <table class="api-table">
+            <tr><td class="method post">POST</td><td><code>/api/chat</code></td><td>Send a message, get a reply</td></tr>
+            <tr><td class="method get">GET</td><td><code>/api/settings</code></td><td>Read current config</td></tr>
+            <tr><td class="method post">POST</td><td><code>/api/settings</code></td><td>Update webhook URL / API key</td></tr>
+            <tr><td class="method post">POST</td><td><code>/api/test-webhook</code></td><td>Ping the webhook URL</td></tr>
+            <tr><td class="method post">POST</td><td><code>/webhook/incoming</code></td><td>FlexiAgent async push-back</td></tr>
+            <tr><td class="method get">GET</td><td><code>/api/history</code></td><td>Full conversation log (JSON)</td></tr>
+            <tr><td class="method get">GET</td><td><code>/api/poll/:sid</code></td><td>Poll for pending async reply</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
