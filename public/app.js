@@ -42,11 +42,14 @@ function applyConfig(cfg) {
     if (!echoBadge) {
       echoBadge = document.createElement("span");
       echoBadge.className = "echo-badge";
-      echoBadge.textContent = "echo mode";
+      echoBadge.textContent = cfg.localAgentActive ? "local agent" : "echo mode";
+      echoBadge.style.background = cfg.localAgentActive ? "rgba(34,197,94,0.15)" : "";
+      echoBadge.style.borderColor = cfg.localAgentActive ? "rgba(34,197,94,0.3)" : "";
+      echoBadge.style.color = cfg.localAgentActive ? "#86efac" : "";
       headerInfo.appendChild(echoBadge);
     }
-    statusEl.textContent = "Echo — configure webhook";
-    statusEl.style.color = "#f59e0b";
+    statusEl.textContent = cfg.localAgentActive ? "Powered by FlexiAgent KB" : "Set webhook or add ANTHROPIC_API_KEY";
+    statusEl.style.color = cfg.localAgentActive ? "#86efac" : "#f59e0b";
   } else {
     if (echoBadge) { echoBadge.remove(); echoBadge = null; }
     statusEl.textContent = "Online";

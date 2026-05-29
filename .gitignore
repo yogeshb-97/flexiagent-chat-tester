@@ -3,3 +3,4 @@ node_modules/
 config.json
 memory.md
 .DS_Store
+.vercel
